@@ -2,7 +2,6 @@
 
 import { useAppStore } from '@/lib/store';
 import { getTranslation, formatTranslation } from '@/lib/translations';
-import type { Locale } from '@/types/i18n';
 
 export function useTranslations() {
   const locale = useAppStore((state) => state.locale);
