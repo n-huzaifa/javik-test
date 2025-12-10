@@ -124,14 +124,10 @@ export function UsersList() {
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground mb-4">
-        {showingText}
-      </p>
-
       {filteredUsers.length > 0 ? (
         <>
           {/* Mobile Card Layout */}
-          <div className="block md:hidden space-y-3 mb-6">
+          <div className="block md:hidden space-y-3 mb-4">
             {paginatedUsers.map((user) => (
               <div
                 key={user.id}
@@ -169,7 +165,7 @@ export function UsersList() {
           </div>
 
           {/* Desktop Table Layout */}
-          <div className="hidden md:block border rounded-lg overflow-hidden mb-6">
+          <div className="hidden md:block border rounded-lg overflow-hidden mb-4">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-muted/50">
@@ -219,45 +215,48 @@ export function UsersList() {
             </div>
           </div>
 
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="w-full sm:w-auto"
-              >
-                <ChevronLeft className="size-4" />
-                {t('users.previous')}
-              </Button>
-              
-              <div className="flex items-center gap-1 flex-wrap justify-center">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className="min-w-10"
-                  >
-                    {page}
-                  </Button>
-                ))}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground order-2 md:order-1">
+              {showingText}
+            </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2 order-1 md:order-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="size-4" />
+                  <span className="hidden sm:inline">{t('users.previous')}</span>
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="min-w-10"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <span className="hidden sm:inline">{t('users.next')}</span>
+                  <ChevronRight className="size-4" />
+                </Button>
               </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="w-full sm:w-auto"
-              >
-                {t('users.next')}
-                <ChevronRight className="size-4" />
-              </Button>
-            </div>
-          )}
+            )}
+          </div>
         </>
       ) : (
         <div className="text-center py-12">
