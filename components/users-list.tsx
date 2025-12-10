@@ -108,10 +108,10 @@ export function UsersList() {
       });
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-semibold mb-6">{t('users.title')}</h1>
+    <div className="w-full max-w-6xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
+      <h1 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">{t('users.title')}</h1>
       
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
           <Input
@@ -130,7 +130,46 @@ export function UsersList() {
 
       {filteredUsers.length > 0 ? (
         <>
-          <div className="border rounded-lg overflow-hidden mb-6">
+          {/* Mobile Card Layout */}
+          <div className="block md:hidden space-y-3 mb-6">
+            {paginatedUsers.map((user) => (
+              <div
+                key={user.id}
+                className="border rounded-lg p-4 bg-card hover:bg-muted/30 transition-colors"
+              >
+                <div className="space-y-3">
+                  <div>
+                    <div className="font-medium text-foreground text-base">{user.name}</div>
+                    <div className="text-muted-foreground text-sm mt-0.5">@{user.username}</div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="text-muted-foreground font-medium">{t('users.email')}: </span>
+                      <span className="text-foreground">{user.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground font-medium">{t('users.phone')}: </span>
+                      <span className="text-foreground">{user.phone}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground font-medium">{t('users.website')}: </span>
+                      <a
+                        href={`https://${user.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {user.website}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden md:block border rounded-lg overflow-hidden mb-6">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-muted/50">
@@ -181,18 +220,19 @@ export function UsersList() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
+                className="w-full sm:w-auto"
               >
                 <ChevronLeft className="size-4" />
                 {t('users.previous')}
               </Button>
               
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap justify-center">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
                     key={page}
@@ -211,6 +251,7 @@ export function UsersList() {
                 size="sm"
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
+                className="w-full sm:w-auto"
               >
                 {t('users.next')}
                 <ChevronRight className="size-4" />
