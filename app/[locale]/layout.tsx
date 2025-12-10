@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
-import type { Locale } from "@/types/i18n";
 import { StoreProvider } from "@/lib/providers/store-provider";
 
 const geistSans = Geist({
@@ -24,16 +23,17 @@ export default async function LocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ locale: Locale }>;
+  params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const validLocale = (locale === 'en' || locale === 'fr') ? locale : 'en';
   
   return (
-    <html lang={locale}>
+    <html lang={validLocale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider locale={locale}>
+        <StoreProvider locale={validLocale}>
           {children}
         </StoreProvider>
       </body>

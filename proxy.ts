@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-const locales = ['en', 'fr'];
-const defaultLocale = 'en';
+import { locales, defaultLocale } from '@/types/i18n';
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -25,4 +23,3 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 };
-
