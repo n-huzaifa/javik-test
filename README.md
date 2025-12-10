@@ -10,8 +10,8 @@ Next.js application with user list, search, pagination, and internationalization
 ## Installation
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/n-huzaifa/javik-test.git
+cd javik-test
 npm install
 ```
 
