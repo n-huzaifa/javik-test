@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from '@/lib/hooks/use-translations';
 
 interface User {
   id: number;
@@ -18,6 +19,7 @@ interface User {
 const USERS_PER_PAGE = 5;
 
 export function UsersList() {
+  const { t } = useTranslations();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export function UsersList() {
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
           <Spinner size="lg" />
-          <p className="text-sm text-muted-foreground">Loading users...</p>
+          <p className="text-sm text-muted-foreground">{t('users.loading')}</p>
         </div>
       </div>
     );
@@ -85,26 +87,36 @@ export function UsersList() {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4 text-center max-w-md">
-          <p className="text-destructive font-medium">Error loading users</p>
+          <p className="text-destructive font-medium">{t('users.error')}</p>
           <p className="text-sm text-muted-foreground">{error}</p>
           <Button onClick={fetchUsers} variant="outline">
-            Retry
+            {t('users.retry')}
           </Button>
         </div>
       </div>
     );
   }
 
+  const userCountText = filteredUsers.length === 1 ? t('users.user') : t('users.users');
+  const showingText = filteredUsers.length === 0
+    ? t('users.noUsersFound')
+    : t('users.showing', {
+        start: startIndex + 1,
+        end: Math.min(endIndex, filteredUsers.length),
+        total: filteredUsers.length,
+        count: userCountText,
+      });
+
   return (
-    <div className="w-full max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-semibold mb-6">Users</h1>
+    <div className="w-full max-w-6xl mx-auto py-8 px-4">
+      <h1 className="text-3xl font-semibold mb-6">{t('users.title')}</h1>
       
       <div className="mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
           <Input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder={t('users.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -113,34 +125,59 @@ export function UsersList() {
       </div>
 
       <p className="text-sm text-muted-foreground mb-4">
-        {filteredUsers.length === 0
-          ? 'No users found'
-          : `Showing ${startIndex + 1}-${Math.min(endIndex, filteredUsers.length)} of ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''}`}
+        {showingText}
       </p>
 
       {filteredUsers.length > 0 ? (
         <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
-            {paginatedUsers.map((user) => (
-              <div
-                key={user.id}
-                className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                <h2 className="font-semibold text-lg mb-2">{user.name}</h2>
-                <p className="text-sm text-muted-foreground mb-1">
-                  <span className="font-medium">Username:</span> {user.username}
-                </p>
-                <p className="text-sm text-muted-foreground mb-1">
-                  <span className="font-medium">Email:</span> {user.email}
-                </p>
-                <p className="text-sm text-muted-foreground mb-1">
-                  <span className="font-medium">Phone:</span> {user.phone}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  <span className="font-medium">Website:</span> {user.website}
-                </p>
-              </div>
-            ))}
+          <div className="border rounded-lg overflow-hidden mb-6">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b">
+                      {t('users.username')}
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b">
+                      {t('users.email')}
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b">
+                      {t('users.phone')}
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b">
+                      {t('users.website')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedUsers.map((user, index) => (
+                    <tr
+                      key={user.id}
+                      className={`hover:bg-muted/30 transition-colors ${
+                        index < paginatedUsers.length - 1 ? 'border-b' : ''
+                      }`}
+                    >
+                      <td className="px-4 py-3 text-sm">
+                        <div className="font-medium text-foreground">{user.name}</div>
+                        <div className="text-muted-foreground text-xs mt-0.5">{user.username}</div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-foreground">{user.email}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{user.phone}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <a
+                          href={`https://${user.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          {user.website}
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {totalPages > 1 && (
@@ -152,7 +189,7 @@ export function UsersList() {
                 disabled={currentPage === 1}
               >
                 <ChevronLeft className="size-4" />
-                Previous
+                {t('users.previous')}
               </Button>
               
               <div className="flex items-center gap-1">
@@ -175,7 +212,7 @@ export function UsersList() {
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
               >
-                Next
+                {t('users.next')}
                 <ChevronRight className="size-4" />
               </Button>
             </div>
@@ -183,7 +220,7 @@ export function UsersList() {
         </>
       ) : (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No users match your search criteria.</p>
+          <p className="text-muted-foreground">{t('users.noUsersMatch')}</p>
         </div>
       )}
     </div>
