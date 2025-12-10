@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from '@/lib/hooks/use-translations';
+import { locales, type Locale } from '@/types/i18n';
 
 interface User {
   id: number;
@@ -19,12 +21,20 @@ interface User {
 const USERS_PER_PAGE = 5;
 
 export function UsersList() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
+  const router = useRouter();
+  const pathname = usePathname();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const handleLocaleChange = (newLocale: Locale) => {
+    const pathWithoutLocale = pathname.replace(/^\/[^/]+/, '') || '/';
+    const newPath = pathWithoutLocale === '/' ? `/${newLocale}` : `/${newLocale}${pathWithoutLocale}`;
+    router.push(newPath);
+  };
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -109,18 +119,31 @@ export function UsersList() {
 
   return (
     <div className="w-full max-w-6xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
-      <h1 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">{t('users.title')}</h1>
-      
-      <div className="mb-4 sm:mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
-          <Input
-            type="text"
-            placeholder={t('users.searchPlaceholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-4">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <h1 className="text-2xl sm:text-3xl font-semibold">{t('users.title')}</h1>
+          <select
+                value={locale}
+                onChange={(e) => handleLocaleChange(e.target.value as Locale)}
+                className="px-3 py-1.5 text-sm border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+              >
+                {locales.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+          </div>
+          <div className="relative flex-1 sm:flex-initial sm:min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
+            <Input
+              type="text"
+              placeholder={t('users.searchPlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+           
         </div>
       </div>
 
